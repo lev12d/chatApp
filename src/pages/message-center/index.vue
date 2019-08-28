@@ -2,7 +2,7 @@
     <div class="message-center" ref="msc">
           <header>
                <ul>
-                   <li> <img/> </li>
+                   <li> <img/>{{loginNickname}} </li>
                    <li>消息</li>
                    <li>＋</li>
                </ul>
@@ -26,18 +26,23 @@
 
 <script>
     export default {
-        name:'messageCenter',
+        name:'message-center',
         data () {
            return{
                groups:[
                    {groupID:1,gruopName:'同学群',groupMember:[ {username:'zhangsan'},{username:'liyang'} ],groupPic:'../../../static/1.jpg'},
                    {groupID:2,gruopName:'同事群',groupMember:[{username:'lisi'}], groupPic:'../../../static/0.jpg'}
-               ]
+               ],
+               loginNickname:''
            }
         },
-        mounted(){
+        created(){
+            this.loginNickname=decodeURI(this.$route.query.nickname)
+        },
+        mounted(){          
              this.$refs.msc.style.height = screen.height + 'px';
-        }
+        },
+      
     }
 </script>
 

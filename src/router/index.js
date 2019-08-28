@@ -8,21 +8,31 @@ export default new Router({
     {
       path: '/',
       redirect:'/login',
+      name:'home',
     },
     {
       path: '/login',
       name:'login',
-      component:() => import('@/pages/login/index.vue')
+      component:() => import('@/pages/login/index.vue'),
+      meta:{
+        isAlive:false
+      }
     },
     {
       path: '/message-center',
       name:'message-center',
-      component:() => import('@/pages/message-center/index.vue')
+      component:() => import('@/pages/message-center/index.vue'),
+      meta:{
+        isAlive:true
+      }
     },
     {
       path: '/group-room',
       name:'group-room',
-      component:() => import('@/pages/group-room/index.vue')
+      component:() => import('@/pages/group-room/index.vue'),
+      meta:{
+        isAlive:true
+      }
     }
   ]
 })

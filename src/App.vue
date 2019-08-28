@@ -1,14 +1,31 @@
 <template>
   <div id="app">
    <transition name="fade-transform" mode="out-in">
-        <router-view/>
+        <keep-alive :include="cacheNames">
+           <router-view/>
+        </keep-alive>
    </transition>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'App'
+  name: 'App',
+  data(){
+    return{
+      cacheNames:[]
+    }
+  },
+ 
+  watch:{
+    $route(){
+      if(this.$route.meta.isAlive){
+          this.cacheNames.push(this.$route.name)
+      }
+      // console.log(this.$route)
+    }
+  }
+  
 }
 </script>
 

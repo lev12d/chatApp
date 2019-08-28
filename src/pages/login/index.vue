@@ -2,12 +2,17 @@
     <div id="login" ref="login">
         <div class="login_form">
              <mu-container>
-                <mu-text-field v-model="username" label="账号/用户名/昵称" label-float help-text="用户名为6-12长度的字符"  ></mu-text-field><br/>
-                <mu-text-field v-model="password" label="密码" label-float error-text="请输入密码"  ></mu-text-field><br/>
-                <mu-button color="primary" >登 录</mu-button>
+                <mu-text-field v-model="username" label="账号/用户名/昵称"  label-float></mu-text-field><br/>
+                <mu-text-field v-model="password" label="密码" label-float   type="password"></mu-text-field><br/>
+                <mu-button color="primary" @click="handleLogin" >登 录</mu-button>
              </mu-container>
         </div>
-
+       
+         <div class="alert_wrap">
+             <mu-alert color="rgba(0,0,0,.7)"  v-if="alert" transition="mu-scale-transition">
+               {{loginMsg}}
+             </mu-alert>
+         </div>
     </div>
 </template>
 
@@ -17,8 +22,36 @@
         data () {
            return{
               username:'',
-              password:''
+              password:'',
+              alert:false,
+              loginMsg:''
            }
+        },
+        methods:{
+            handleLogin(){
+             let   userInfo = {
+                 username:this.username,
+                 password:this.password
+             }
+           const loading= this.$loading()
+            this.axios.post('/apis/login',userInfo).then(({data})=>{
+              setTimeout(()=>{
+                 loading.close();                   
+                 this.loginMsg = data.msg;
+                 this.alert = true
+                     setTimeout(()=>{
+                             this.alert =false;
+                             if(data.status == 1){   
+                                                
+                                this.$router.push({name:'message-center',query:{nickname:encodeURI(data.nickname)}})
+                                }
+                          },2500)
+                 },3000)
+                
+             })    
+           },
+
+          
         },
         mounted(){
             this.$refs.login.style.height = screen.height + 'px';
@@ -37,4 +70,7 @@
     #login{width: 100%; background:url('../../../static/bg.jpg');background-size: 100%;position: relative;}
     #login .login_form{width: 100%;height: 200px;position: absolute;left: 0;top: 60px}
     .login_form >>> .mu-primary-color{width: 256px;}
+    #login .alert_wrap{ min-width: 200px;height: 10px;;position: absolute; left: 50%;top:50%; transform: translate(-50%,-50%);}
+    #login .alert_wrap  >>> .mu-alert{padding:10px 5px;min-height:40px;line-height:40px;display: block;}
+   .mu-alert >>> .mu-inverse{text-align:center}
 </style>

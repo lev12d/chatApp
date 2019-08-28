@@ -8,7 +8,11 @@
         </header>
 
         <div class="message" ref="msg">
-             
+               <ul>
+                   <li>
+                       <img src="" alt=""><span class="txt"></span>
+                   </li>
+               </ul>
         </div>
     </div>
 </template>
@@ -24,7 +28,7 @@
         mounted(){
             this.$refs.msg.style.minHeight = screen.height - 50 + 'px'
              this.roomName = this.$route.params.gruopName 
-            console.log(this.$route.params)
+           
         }
     }
 </script>
