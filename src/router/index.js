@@ -31,7 +31,7 @@ export default new Router({
       name:'group-room',
       component:() => import('@/pages/group-room/index.vue'),
       meta:{
-        isAlive:true
+        isAlive:false
       }
     }
   ]

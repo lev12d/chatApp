@@ -2,15 +2,15 @@
     <div class="message-center" ref="msc">
           <header>
                <ul>
-                   <li> <img/>{{loginNickname}} </li>
+                   <li> <img src="../../../static/timg.jpg"/><span>{{loginNickname}}</span> </li>
                    <li>消息</li>
                    <li>＋</li>
                </ul>
           </header>
           <div class="items">
                  <ul class="message-group">
-                      <router-link tag="li" v-for="(item) in groups" :key="item.groupID" :to="{name:'group-room',params:item}">
-                         <img :src="item.groupPic" alt=""> <span>{{item.gruopName}}</span>
+                      <router-link tag="li" v-for="(item) in groups" :key="item._id" :to="{path:'/group-room',query:{groupName:encodeURI(item.groupName),groupNum:encodeURI(item.groupAccount)}}">
+                         <img src="../../../static/1.jpg" alt=""> <span>{{item.groupName}}</span>
                      </router-link>
                  </ul>
           </div>
@@ -29,18 +29,24 @@
         name:'message-center',
         data () {
            return{
-               groups:[
-                   {groupID:1,gruopName:'同学群',groupMember:[ {username:'zhangsan'},{username:'liyang'} ],groupPic:'../../../static/1.jpg'},
-                   {groupID:2,gruopName:'同事群',groupMember:[{username:'lisi'}], groupPic:'../../../static/0.jpg'}
-               ],
+               groups:'',
                loginNickname:''
            }
         },
+        methods :{
+          getGroups(){
+              this.axios.get('/apis/getGroups').then(({data})=>{
+                  this.groups = data.data
+                  //console.log(data.data)
+              })
+          }
+        },
         created(){
-            this.loginNickname=decodeURI(this.$route.query.nickname)
+             this.loginNickname=this.$cookies.get('nickname')         
         },
         mounted(){          
              this.$refs.msc.style.height = screen.height + 'px';
+             this.getGroups();
         },
       
     }
@@ -48,13 +54,17 @@
 
 <style scoped>
    .message-center {width: 100%;position: relative;}
-    .message-center header{width: 100%;height: 50px;background: #2196f3;}
-     header ul{width: 100%;height: 50px;display: flex;justify-content: space-between;align-items: center}
-    header ul li{color: white;float: left}
-    header ul li:nth-of-type(2){font-size: 16px;margin-left: 15px}
-    header ul li:nth-of-type(3){font-size: 30px}
+    .message-center header{width: 100%;height: 50px;background: #2196f3;position: fixed;left: 0;top: 0}
+     header ul{width: 100%;height: 50px;display: flex;justify-content: space-between;align-items: center;padding:8px}
+    header ul li{color: white;float: left;min-width: 65px;}
+    header ul li:nth-of-type(1){display: flex;justify-content: space-between;align-items: center}
+    header ul li:nth-of-type(2){font-size: 16px;}
+    header ul li:nth-of-type(3){font-size: 30px;}
+    header ul li:nth-of-type(1) img{width: 35px;height: 35px;border-radius: 50%;}
+    header ul li:nth-of-type(1) span{padding-left: 5px;font-size: 12px}
+    .items{margin-top: 50px}
     .items .message-group li{width: 100%;height: 60px;border-bottom: 1px solid #e0e0e0;text-align: left;} 
     .items .message-group li img{width: 50px;height: 50px;border-radius: 50%;margin-left: 10px;vertical-align: middle;margin-top: 5px}    
     .items .message-group li span{display: inline-block;margin-left: 4px;font-size: 18px;font-weight: bolder;}
-     footer {width: 100%;height: 50px;position: absolute;left: 0;bottom: 0}
+     footer {width: 100%;height: 50px;position: fixed;left: 0;bottom: 0}
 </style>

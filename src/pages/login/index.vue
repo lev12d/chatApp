@@ -21,8 +21,8 @@
         name:'login',
         data () {
            return{
-              username:'',
-              password:'',
+              username:'lisi123',
+              password:'123456',
               alert:false,
               loginMsg:''
            }
@@ -42,8 +42,10 @@
                      setTimeout(()=>{
                              this.alert =false;
                              if(data.status == 1){   
-                                                
-                                this.$router.push({name:'message-center',query:{nickname:encodeURI(data.nickname)}})
+                                 console.log(data)
+                                 this.$cookies.set('nickname',data.nickname)
+                                 this.$cookies.set('user_id',data.data._id)                
+                                 this.$router.push({name:'message-center'})
                                 }
                           },2500)
                  },3000)

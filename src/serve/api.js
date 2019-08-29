@@ -5,10 +5,6 @@ module.exports = function(app){
            next()
     })
 
-    app.get('/',function(req,res){
-        res.send('<h1>这是服务器向客户端发送的一条数据</h1>');
-      // res.json({status:1,msg:'success'})
-    })
     
     app.post('/api/login',function(req,res){
         req.on('data',function(data){
@@ -23,7 +19,7 @@ module.exports = function(app){
                         res.json({ status:-1, msg:'该用户不存在!'})
                        }else{
                            if(data.password === userObj.password){
-                               res.json({ status:1, msg:'登录成功!',nickname:data.nickname})
+                               res.json({ status:1, msg:'登录成功!',nickname:data.nickname,data})
                            }else{
                                res.json({status:0, msg:'密码错误!'})
                           }
@@ -32,5 +28,23 @@ module.exports = function(app){
              }
         })
       
+    })
+
+    app.get('/api/getGroups',function(req,res){
+         db.groupModel.find({},function(err,data){
+              if(err){
+                res.json({ status:-1,msg:'查询出错:'+ err});
+                return
+              }
+              res.json({ status:1,msg:'查询成功',data})
+         })
+        // res.json({status:222,msg:'ss'})
+    })
+
+    app.post('/api/getChatLog',function(req,res){
+          req.on('data',function(data){
+            let  groupAccount = JSON.parse(data).groupAccount;
+               console.log(groupAccount)
+          })
     })
 }
