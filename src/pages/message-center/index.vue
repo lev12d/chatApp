@@ -35,9 +35,14 @@
         },
         methods :{
           getGroups(){
-              this.axios.get('/apis/getGroups').then(({data})=>{
-                  this.groups = data.data
-                  //console.log(data.data)
+              let userAccount = this.$cookies.get('userAccount');
+              this.axios.post('/apis/getGroups',{userAccount}).then(({data})=>{
+                   if(data.status==1){
+                        this.groups = data.data;
+                        // console.log(this.groups)
+                        this.$cookies.set('groups',JSON.stringify(data.data))
+                   }
+                   
               })
           }
         },

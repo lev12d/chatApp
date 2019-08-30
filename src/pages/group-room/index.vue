@@ -1,24 +1,33 @@
 <template>
-    <div class="room">
+    <div class="room" >
        <header>
              
                     <router-link tag="span" to="message-center"> 返回</router-link>             
-                    <span>{{roomName}}</span>                
+                    <span>{{roomName}} ({{groupMemberNum}})</span>                
                
         </header>
 
         <div class="message" ref="msg">
                <ul>
-                   <li>
-                       <img src="" alt=""><span class="txt"></span>
+                   <li v-for="(item) in chatLog" :key="item._id" :class="item.nickname==nickname?'right':'left'">
+                       <div  class="txt">
+                           <img :src="item.nickname==nickname?'../../../static/0.jpg':'../../../static/1.jpg'">
+                            <div class="msg-txt">
+                                <p>{{item.nickname}}</p>
+                                <span >{{item.msg}}</span>
+                            </div>
+                            
+                            
+                       </div>
+                      
                    </li>
                </ul>
         </div>
 
         <footer>
               <ol class="send-msg-area">
-                  <li><input type="text" id="input-txt"></li>                
-                  <li><span>发送</span></li>
+                  <li><input type="text" id="input-txt" ref="input"></li>                
+                  <li><span @click="sendMsg">发送</span></li>
               </ol>
         </footer>
     </div>
@@ -31,32 +40,40 @@ import io from 'socket.io-client'
         data () {
            return {
                roomName :'',
-               groupNum:'',
+               groupId:'',
+               groupMemberNum:0,
                socket:null,
                nickname:'',
                userAccount:'',
-               chatLog:[]
+               chatLog:[],
+               
            }
         },
     methods:{
             initSocket(){
                 //昵称存在表示用户已经登录了
                if(this.$cookies.get('nickname')){
-                   this.socket = io.connect('http://localhost:9000');
+                   this.socket = io.connect('http://localhost:9001');
                    this.nickname = this.$cookies.get('nickname');
-                   this.userAccount = 'lisi123';
-                   let chat ={
-                       userAccount :this.userAccount,
-                       nickname :this.nickname,
-                       msgTime : Date.parse(new Date()),
-                       groupAccount : 110,
-                       msg:'hello'
-                   }
+                   this.userAccount = this.$cookies.get('userAccount');
+                   let groups = JSON.parse(this.$cookies.get('groups'))
+                   groups.forEach((ele)=>{
+                      if(this.groupId==ele.groupAccount){
+                            this.groupMemberNum = ele.groupMember.length;
+                      }
+                   })
+                //    let chat ={
+                //        userAccount :this.userAccount,
+                //        nickname :this.nickname,
+                //        msgTime : Date.parse(new Date()),
+                //        groupAccount : 110,
+                //        msg:this.nickname+'已加入!'
+                //    }
                     
-                    this.socket.removeAllListeners()
-                   setTimeout(()=>{                      
-                       this.socket.emit('joinToRoom',chat)
-                   },200)
+                //     this.socket.removeAllListeners()
+                //    setTimeout(()=>{                      
+                //        this.socket.emit('joinToRoom',chat)
+                //    },200)
 
                    this.talk()
                }else{
@@ -65,9 +82,14 @@ import io from 'socket.io-client'
             },
 
          getChatLog(){
-             let groupNum = Number(this.groupNum);
-             this.axios.post('/apis/getChatLog',{groupAccount:groupNum}).then(({data})=>{
-                     console.log(data)
+             let groupId = Number(this.groupId);
+             this.axios.post('/apis/getChatLog',{groupAccount:groupId}).then(({data})=>{
+                    if(data.status === 1){
+                         this.chatLog=data.data
+                    }else{
+                        console.log(data.msg)
+                    }
+                   // console.log(this.chatLog)
              })
          },   
 
@@ -77,13 +99,14 @@ import io from 'socket.io-client'
 
                 this.socket.on('joinToRoom',function(data){
                      let chat = data
-                     chat.msgTime = this.timeFormat(chat.msgTime)
+                     chat.msgTime = that.timeFormat(chat.msgTime)
                      that.chatLog.push(chat)
                 })
 
-                 this.socket.on('broadChat',function(data){
+                 this.socket.on('broadMsg',function(data){
                      let chat = data
-                     chat.msgTime = this.timeFormat(chat.msgTime)
+                     //console.log(chat)
+                     chat.msgTime = that.timeFormat(chat.msgTime)
                      that.chatLog.push(chat)
                 })
             },
@@ -97,28 +120,70 @@ import io from 'socket.io-client'
             let mm = time.getMinutes()
             let s = time.getSeconds()
             return y + '/' + this.add0(m) + '/' + this.add0(d) + ' ' + this.add0(h) + ':' + this.add0(mm) + ':' + this.add0(s)
-      }
-        },
+           },
+          
+          add0 (m) {
+                   return m < 10 ? '0' + m : m
+          },
+
+       sendMsg(){
+           let inputText = this.$refs.input.value;
+           let chatMsg = {
+                userAccount:this.userAccount,
+                nickname:this.nickname,
+                groupAccount:this.groupId,
+                msgTime:Date.parse(new Date()),
+                groupName:this.roomName,
+                msg:inputText
+             }
+             //console.log(chatMsg)
+             this.socket.emit('g1',chatMsg);
+             this.$refs.input.value = '';
+          }
+        
+     },
         created(){
-            this.groupNum = decodeURI(this.$route.query.groupNum);
+            this.groupId = decodeURI(this.$route.query.groupNum);
             this.roomName = decodeURI(this.$route.query.groupName);
             this.getChatLog()
             this.initSocket()
         },
         mounted(){
-             
-            this.$refs.msg.style.minHeight = screen.height - 50 + 'px'        
+            this.$refs.msg.style.height = screen.height - 50 + 'px'  
+            // console.log(this.$refs.msg)      
+            // this.$refs.msg.scrollTo(0,9999)
+        },
+        updated(){
+            this.$refs.msg.scrollTo(0,999999)
         }
     }
 </script>
 
 <style scoped>
    .room{position: relative;}
-    header{width: 100%;height: 50px;background: #2196f3;position: fixed;left: 0;top: 0}
+    header{width: 100%;height: 50px;background: #2196f3;position: fixed;left: 0;top: 0;z-index: 10;}
      header span{font-size: 16px;text-align: center;color: white;height: 50px;line-height: 50px;float: left;}
       header span:nth-of-type(1){margin-left: 5px;}
      header span:nth-of-type(2){position: absolute;left: 50%;top:50%;transform: translate(-50%, -50%);}
-     .message{width:100%;background: #dedede;overflow: auto}
+     .message{width:100%;background: #dedede;overflow-y: scroll;padding-top: 50px;padding-bottom: 50px;}
+     .message li{padding: 10px 5px;position: relative;overflow: hidden;}
+     .message li p{color: #888;padding-bottom:4px}
+     .message li .txt{ width: 100%;}
+     .message li.left .txt .msg-txt{width: 200px;float: left;}
+     .message li.right .txt .msg-txt{width: 200px;float: right;}
+     .message li.right{text-align: right}  
+     .message li.right img{float: right}  
+     .message li.left{text-align: left}
+     .message li.left img{float:left}
+     .message li img{width: 40px;height: 40px;border-radius: 50%;display: block;}
+     .message li span{display: inline-block;max-width: 200px;border-radius: 8px;background: #6abe83;color: black;
+     padding: 10px 15px;position: relative;}
+     .message li span::after{content: '';position: absolute;border-top: 6px solid transparent;border-bottom:6px solid transparent;
+      top: 9px}
+      .message li.left .msg-txt{margin-left: 10px}
+      .message li.right .msg-txt{margin-right: 10px}
+      .message li.left span::after{ border-right:6px solid #6abe83;left:-6px;}
+      .message li.right span::after{border-left:6px solid #6abe83;right:-6px;}
 
      footer{width: 100%;min-height: 50px;position: fixed;left: 0;bottom: 0;border: 1px solid #c1c1c1;border-left: none;border-right: none;
      background: #dedede}

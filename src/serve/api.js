@@ -30,21 +30,39 @@ module.exports = function(app){
       
     })
 
-    app.get('/api/getGroups',function(req,res){
-         db.groupModel.find({},function(err,data){
-              if(err){
-                res.json({ status:-1,msg:'查询出错:'+ err});
-                return
-              }
-              res.json({ status:1,msg:'查询成功',data})
+    app.post('/api/getGroups',function(req,res){
+         req.on('data',function(data){
+            let userAccount = JSON.parse(data).userAccount;
+            //找出当前登录用户加入的群组
+            db.groupModel.find({groupMember:userAccount},function(err,data){
+                if(err){
+                    res.json({status:-1,msg:'查询出错'+err})
+                }else{
+                    if(!data){
+                      res.json({status:0,msg:'该用户暂时未加入任何群组'});
+                    }else{
+                        res.json({status:1,msg:'查询用户群组成功',data})
+                    }
+                }
+            })
          })
-        // res.json({status:222,msg:'ss'})
     })
 
     app.post('/api/getChatLog',function(req,res){
           req.on('data',function(data){
             let  groupAccount = JSON.parse(data).groupAccount;
-               console.log(groupAccount)
+              currentModel = groupAccount === 110?db.groupMsgModelA:db.groupMsgModelB;
+              currentModel.find({},function(err,data){
+                     if(err){
+                         res.json({status:-1,msg:'查询出错'+err})
+                     }else{
+                         if(!data){
+                           res.json({status:0,msg:'该群还没有任何消息记录'});
+                         }else{
+                             res.json({status:1,msg:'读取消息记录成功',data})
+                         }
+                     }
+              })
           })
     })
 }

@@ -77,32 +77,32 @@ const initGroup = [
     }
 ]
 
-const initGroupMsgA = [
-    {
-    'userAccount' :'zhangsan123',
-    'nickname' : '张三',
-    'msgTime' : 1504509461000,
-    'msg' : '吃饭了嘛',
-    'groupAccount':110,
-    'groupName':'同学群'
-    },
-    {
-        'userAccount' :'zhangsan123',
-        'nickname' : '张三',
-        'msgTime' : 1504509461020,
-        'msg' : '?',
-        'groupAccount':110,
-        'groupName':'同学群'
-     },
-     {
-        'userAccount' :'lisi123',
-        'nickname' : '李四',
-        'msgTime' : 1504509461220,
-        'msg' : '吃了',
-        'groupAccount':110,
-        'groupName':'同学群'
-     }
-]
+// const initGroupMsgA = [
+//     {
+//     'userAccount' :'zhangsan123',
+//     'nickname' : '张三',
+//     'msgTime' : 1504509461000,
+//     'msg' : '吃饭了嘛',
+//     'groupAccount':110,
+//     'groupName':'同学群'
+//     },
+//     {
+//         'userAccount' :'zhangsan123',
+//         'nickname' : '张三',
+//         'msgTime' : 1504509461020,
+//         'msg' : '?',
+//         'groupAccount':110,
+//         'groupName':'同学群'
+//      },
+//      {
+//         'userAccount' :'lisi123',
+//         'nickname' : '李四',
+//         'msgTime' : 1504509461220,
+//         'msg' : '吃了',
+//         'groupAccount':110,
+//         'groupName':'同学群'
+//      }
+// ]
 
 const initGroupMsgB = [
     {
@@ -121,6 +121,7 @@ const initGroupMsgB = [
         'groupAccount':120,
         'groupName':'同事群'
      },
+    
     
 ]
 
@@ -154,13 +155,14 @@ const initData = function(){
    db.groupMsgModelA.find({},function(err,data){
     if(err){
         console.log('初始化群1消息出错!'+ err)
-    }else if(!data.length){
-        initGroupMsgA.map(item =>{
-           db.groupMsgModelA.create(item);
-       })
-    }else{
-        console.log("群1消息："+data)
     }
+    // else if(!data.length){
+    //     initGroupMsgA.map(item =>{
+    //        db.groupMsgModelA.create(item);
+    //    })
+    // }else{
+    //     console.log("群1消息："+data)
+    // }
 })
 
  //初始化第二个群的消息记录

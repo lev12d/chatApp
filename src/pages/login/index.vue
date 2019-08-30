@@ -42,9 +42,10 @@
                      setTimeout(()=>{
                              this.alert =false;
                              if(data.status == 1){   
-                                 console.log(data)
+                                //  console.log(data)
                                  this.$cookies.set('nickname',data.nickname)
-                                 this.$cookies.set('user_id',data.data._id)                
+                                 this.$cookies.set('user_id',data.data._id)  
+                                 this.$cookies.set('userAccount',data.data.userAccount)               
                                  this.$router.push({name:'message-center'})
                                 }
                           },2500)
