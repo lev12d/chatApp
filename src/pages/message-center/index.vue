@@ -2,7 +2,7 @@
     <div class="message-center" ref="msc">
           <header>
                <ul>
-                   <li> <img src="../../../static/timg.jpg"/><span>{{loginNickname}}</span> </li>
+                   <li @click="opens" ref="lis"> <img src="../../../static/timg.jpg"/><span>{{loginNickname}}</span> </li>
                    <li>消息</li>
                    <li>＋</li>
                </ul>
@@ -21,6 +21,14 @@
                  <mu-bottom-nav-item title="动态" ></mu-bottom-nav-item>
                </mu-bottom-nav>
           </footer>
+
+ <mu-popover  :open="open" :trigger="trigger">
+      <mu-list>
+       <mu-list-item button>
+          <mu-list-item-title>退出登录</mu-list-item-title>
+      </mu-list-item>
+  </mu-list>
+</mu-popover>
     </div>
 </template>
 
@@ -30,7 +38,9 @@
         data () {
            return{
                groups:'',
-               loginNickname:''
+               loginNickname:'',
+               open:false,
+               trigger:null
            }
         },
         methods :{
@@ -44,12 +54,17 @@
                    }
                    
               })
+          },
+
+          opens(){
+              this.open=!this.open
           }
         },
         created(){
              this.loginNickname=this.$cookies.get('nickname')         
         },
-        mounted(){          
+        mounted(){      
+              this.trigger=this.$refs.lis 
              this.$refs.msc.style.height = screen.height + 'px';
              this.getGroups();
         },

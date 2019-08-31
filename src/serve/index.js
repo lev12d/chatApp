@@ -25,8 +25,29 @@ io.on('connection',function(socket){
                groupsMember[groupAccount] = [];
            }
            groupsMember[groupAccount].push(socket.nickname)
+          //  let set = new Set(groupsMember[groupAccount]); //去重
+          //  groupsMember[groupAccount] = Array.from(set)
            socket.join(groupAccount);
            io.sockets.in(groupAccount).emit('joinToRoom',chatMsg)
+           console.log(groupsMember[groupAccount])
+      })
+
+      socket.on('leaveToRoom', function (data) {
+        console.log('leaveToRoom')
+        chat = data
+        socket.userAccount = chat.userAccount
+        socket.nickname = chat.nickname
+        let groupAccount = chat.groupAccount
+        // 从房间名单中移除
+       if(groupsMember[groupAccount]>0){
+        let index = groupsMember[groupAccount].indexOf(socket.nickname);
+          if (index !== -1) {
+          groupsMember[groupAccount].splice(index, 1);
+          }
+       }      
+        socket.leave(groupAccount)
+        io.sockets.in(groupAccount).emit('leaveToRoom', chat)
+        console.log(groupsMember[groupAccount])
       })
 
       socket.on('g1',function(data){

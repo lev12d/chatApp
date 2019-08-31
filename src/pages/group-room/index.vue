@@ -7,21 +7,26 @@
                
         </header>
 
-        <div class="message" ref="msg">
-               <ul>
-                   <li v-for="(item) in chatLog" :key="item._id" :class="item.nickname==nickname?'right':'left'">
-                       <div  class="txt">
-                           <img :src="item.nickname==nickname?'../../../static/0.jpg':'../../../static/1.jpg'">
+        <div class="message" ref="msg">              
+            <ul>
+                  
+                <li v-for="(item) in chatLog" :key="item._id" :class="item.nickname==nickname?'right':'left'">
+
+                        <div v-if="item.type=='systemMsg'" class="system-msg">                           
+                                <i>{{item.systemMsg}}</i>                           
+                         </div>
+
+                       <div  class="txt" v-else>
+                           <img :src="item.nickname==nickname?'../../../static/timg.jpg':'../../../static/1.jpg'">
                             <div class="msg-txt">
                                 <p>{{item.nickname}}</p>
                                 <span >{{item.msg}}</span>
-                            </div>
-                            
-                            
-                       </div>
-                      
-                   </li>
-               </ul>
+                            </div>                                                      
+                       </div>                     
+                </li>
+                    
+            </ul>
+              
         </div>
 
         <footer>
@@ -46,7 +51,6 @@ import io from 'socket.io-client'
                nickname:'',
                userAccount:'',
                chatLog:[],
-               
            }
         },
     methods:{
@@ -62,18 +66,19 @@ import io from 'socket.io-client'
                             this.groupMemberNum = ele.groupMember.length;
                       }
                    })
-                //    let chat ={
-                //        userAccount :this.userAccount,
-                //        nickname :this.nickname,
-                //        msgTime : Date.parse(new Date()),
-                //        groupAccount : 110,
-                //        msg:this.nickname+'已加入!'
-                //    }
+                   let chat ={
+                       userAccount :this.userAccount,
+                       nickname :this.nickname,
+                       msgTime : Date.parse(new Date()),
+                       groupAccount : 110,
+                       systemMsg:this.nickname+'加入房间!',
+                       type:'systemMsg'
+                   }
                     
-                //     this.socket.removeAllListeners()
-                //    setTimeout(()=>{                      
-                //        this.socket.emit('joinToRoom',chat)
-                //    },200)
+                    this.socket.removeAllListeners()
+                   setTimeout(()=>{                      
+                       this.socket.emit('joinToRoom',chat)
+                   },200)
 
                    this.talk()
                }else{
@@ -98,6 +103,12 @@ import io from 'socket.io-client'
                 this.socket.removeAllListeners();
 
                 this.socket.on('joinToRoom',function(data){
+                     let chat = data
+                     chat.msgTime = that.timeFormat(chat.msgTime)
+                     that.chatLog.push(chat)
+                })
+               
+               this.socket.on('leaveToRoom', function (data) {
                      let chat = data
                      chat.msgTime = that.timeFormat(chat.msgTime)
                      that.chatLog.push(chat)
@@ -139,6 +150,21 @@ import io from 'socket.io-client'
              //console.log(chatMsg)
              this.socket.emit('g1',chatMsg);
              this.$refs.input.value = '';
+          },
+
+          disconnectSocket(){
+              let chat ={
+                       userAccount :this.userAccount,
+                       nickname :this.nickname,
+                       msgTime : Date.parse(new Date()),
+                       groupAccount : 110,
+                       systemMsg:this.nickname+'离开房间!',
+                       type:'systemMsg'
+                   }
+            this.socket.removeAllListeners()
+            setTimeout(()=>{
+                this.socket.emit('leaveToRoom', chat);
+            },200)
           }
         
      },
@@ -155,6 +181,9 @@ import io from 'socket.io-client'
         },
         updated(){
             this.$refs.msg.scrollTo(0,999999)
+        },
+        beforeDestroy(){
+            this.disconnectSocket();
         }
     }
 </script>
@@ -166,8 +195,10 @@ import io from 'socket.io-client'
       header span:nth-of-type(1){margin-left: 5px;}
      header span:nth-of-type(2){position: absolute;left: 50%;top:50%;transform: translate(-50%, -50%);}
      .message{width:100%;background: #dedede;overflow-y: scroll;padding-top: 50px;padding-bottom: 50px;}
-     .message li{padding: 10px 5px;position: relative;overflow: hidden;}
-     .message li p{color: #888;padding-bottom:4px}
+     .message li .system-msg { font-size: 12px;transform: scale(0.9);text-align: center;padding: 0;}
+     .message li .system-msg i{font-style: normal;font-weight: normal;background: #ccc;color: #2196f3;padding: 4px;border-radius: 4px}
+     .message li{padding: 8px 5px;position: relative;overflow: hidden;}
+     .message li p{color: #888;padding-bottom:4px;font-size: 12px}
      .message li .txt{ width: 100%;}
      .message li.left .txt .msg-txt{width: 200px;float: left;}
      .message li.right .txt .msg-txt{width: 200px;float: right;}
