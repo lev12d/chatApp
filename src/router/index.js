@@ -19,11 +19,19 @@ export default new Router({
       }
     },
     {
+      path: '/register',
+      name:'register',
+      component:() => import('@/pages/register/index.vue'),
+      meta:{
+        isAlive:false
+      }
+    },
+    {
       path: '/message-center',
       name:'message-center',
       component:() => import('@/pages/message-center/index.vue'),
       meta:{
-        isAlive:true
+        isAlive:false
       }
     },
     {

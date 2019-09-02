@@ -25,15 +25,12 @@ io.on('connection',function(socket){
                groupsMember[groupAccount] = [];
            }
            groupsMember[groupAccount].push(socket.nickname)
-          //  let set = new Set(groupsMember[groupAccount]); //去重
-          //  groupsMember[groupAccount] = Array.from(set)
            socket.join(groupAccount);
            io.sockets.in(groupAccount).emit('joinToRoom',chatMsg)
-           console.log(groupsMember[groupAccount])
+          //  console.log(groupsMember[groupAccount])
       })
 
       socket.on('leaveToRoom', function (data) {
-        console.log('leaveToRoom')
         chat = data
         socket.userAccount = chat.userAccount
         socket.nickname = chat.nickname
@@ -47,7 +44,7 @@ io.on('connection',function(socket){
        }      
         socket.leave(groupAccount)
         io.sockets.in(groupAccount).emit('leaveToRoom', chat)
-        console.log(groupsMember[groupAccount])
+        // console.log(groupsMember[groupAccount])
       })
 
       socket.on('g1',function(data){
@@ -58,8 +55,8 @@ io.on('connection',function(socket){
                if(err){
                  console.log("加入数据失败"+err)
                }else{
-
-               }console.log("加入数据成功")
+                console.log("加入数据成功")
+               }
              })
              io.sockets.in('g1').emit('broadMsg',data)
             // socket.emit('broadMsg',data)

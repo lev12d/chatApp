@@ -2,10 +2,11 @@
     <div id="login" ref="login">
         <div class="login_form">
              <mu-container>
-                <mu-text-field v-model="username" label="账号/用户名/昵称"  label-float></mu-text-field><br/>
+                <mu-text-field v-model="username" label="账号/用户名"  label-float></mu-text-field><br/>
                 <mu-text-field v-model="password" label="密码" label-float   type="password"></mu-text-field><br/>
                 <mu-button color="primary" @click="handleLogin" >登 录</mu-button>
              </mu-container>
+             <div class="reg">  <router-link tag="span" to="register">新用户注册</router-link> </div>
         </div>
        
          <div class="alert_wrap">
@@ -17,44 +18,57 @@
 </template>
 
 <script>
-    export default {
-        name:'login',
-        data () {
-           return{
+export default {
+    name:'login',
+    data () {
+        return{
               username:'lisi123',
               password:'123456',
               alert:false,
               loginMsg:''
            }
         },
-        methods:{
-            handleLogin(){
-             let   userInfo = {
+    methods:{
+         handleLogin(){              
+            let   userInfo = {
                  username:this.username,
                  password:this.password
              }
-           const loading= this.$loading()
+            const loading= this.$loading()
             this.axios.post('/apis/login',userInfo).then(({data})=>{
               setTimeout(()=>{
-                 loading.close();                   
+                  loading.close();                   
                  this.loginMsg = data.msg;
                  this.alert = true
                      setTimeout(()=>{
                              this.alert =false;
                              if(data.status == 1){   
-                                //  console.log(data)
-                                 this.$cookies.set('nickname',data.nickname)
-                                 this.$cookies.set('user_id',data.data._id)  
-                                 this.$cookies.set('userAccount',data.data.userAccount)               
-                                 this.$router.push({name:'message-center'})
+                                 this.$store.dispatch('updateLoginStates',true)
+                                 this.$store.dispatch('updateUserStates',data.data)                                  
+                                 this.$router.push({name:'message-center'})                                
                                 }
                           },2500)
                  },3000)
                 
-             })    
+             },(err)=>{
+                if(err){
+                     loading.close();
+                     this.loginMsg = '无法连接到服务器!';
+                     this.alert = true;
+                     setTimeout(()=>{
+                          this.alert = false;
+                     },2500)
+                }
+             })  
            },
 
           
+        },
+        created(){
+            let loginState = this.$store.getters.getLoginState;
+            if(loginState){
+               this.$router.push({name:'message-center'})
+            }
         },
         mounted(){
             this.$refs.login.style.height = screen.height + 'px';
@@ -76,4 +90,6 @@
     #login .alert_wrap{ min-width: 200px;height: 10px;;position: absolute; left: 50%;top:50%; transform: translate(-50%,-50%);}
     #login .alert_wrap  >>> .mu-alert{padding:10px 5px;min-height:40px;line-height:40px;display: block;}
    .mu-alert >>> .mu-inverse{text-align:center}
+    #login .reg{margin-top:15px;color:#0F7ACF;}
+    #login .reg span{padding:5px}
 </style>

@@ -2,16 +2,17 @@
     <div class="message-center" ref="msc">
           <header>
                <ul>
-                   <li @click="opens" ref="lis"> <img src="../../../static/timg.jpg"/><span>{{loginNickname}}</span> </li>
+                   <li > <img :src="avatar"/><span>{{loginNickname}}</span> </li>
                    <li>消息</li>
-                   <li>＋</li>
+                   <li @click="opens" ref="lis">＋</li>
                </ul>
           </header>
           <div class="items">
                  <ul class="message-group">
                       <router-link tag="li" v-for="(item) in groups" :key="item._id" :to="{path:'/group-room',query:{groupName:encodeURI(item.groupName),groupNum:encodeURI(item.groupAccount)}}">
-                         <img src="../../../static/1.jpg" alt=""> <span>{{item.groupName}}</span>
+                         <img src="../../../static/timg.jpg" alt=""> <span>{{item.groupName}}</span>
                      </router-link>
+            
                  </ul>
           </div>
           <footer>
@@ -24,9 +25,12 @@
 
  <mu-popover  :open="open" :trigger="trigger">
       <mu-list>
-       <mu-list-item button>
-          <mu-list-item-title>退出登录</mu-list-item-title>
-      </mu-list-item>
+        <mu-list-item button>
+            <mu-list-item-title>添加群组</mu-list-item-title>
+         </mu-list-item>
+        <mu-list-item button @click="logout">
+           <mu-list-item-title >退出登录</mu-list-item-title>
+        </mu-list-item>
   </mu-list>
 </mu-popover>
     </div>
@@ -40,17 +44,18 @@
                groups:'',
                loginNickname:'',
                open:false,
-               trigger:null
+               trigger:null,
+               avatar:''
            }
         },
         methods :{
           getGroups(){
-              let userAccount = this.$cookies.get('userAccount');
+              let userAccount =this.$store.getters.getUserInfoState.userAccount;
               this.axios.post('/apis/getGroups',{userAccount}).then(({data})=>{
                    if(data.status==1){
                         this.groups = data.data;
-                        // console.log(this.groups)
-                        this.$cookies.set('groups',JSON.stringify(data.data))
+                         this.$store.dispatch('updateGroupsStates',data.data)
+                        // console.log(this.$store.getters.getGroupsInfoState)
                    }
                    
               })
@@ -58,15 +63,26 @@
 
           opens(){
               this.open=!this.open
+          },
+
+          logout(){
+              this.open =false
+              this.$store.dispatch('updateLoginStates',false)
+              this.$store.dispatch('updateUserStates',null)
+               this.$store.dispatch('updateGroupsStates',null)
+              this.$router.push({name:'login'})
+             // console.log(this.$store.getters.getUserInfoState)
           }
         },
         created(){
-             this.loginNickname=this.$cookies.get('nickname')         
+             this.loginNickname=this.$store.getters.getUserInfoState.nickname; //昵称
+             this.avatar = this.$store.getters.getUserInfoState.avatar;  //头像     
         },
         mounted(){      
               this.trigger=this.$refs.lis 
              this.$refs.msc.style.height = screen.height + 'px';
              this.getGroups();
+            
         },
       
     }

@@ -17,7 +17,7 @@
                          </div>
 
                        <div  class="txt" v-else>
-                           <img :src="item.nickname==nickname?'../../../static/timg.jpg':'../../../static/1.jpg'">
+                           <img :src="item.nickname==nickname?avatar:item.avatar">
                             <div class="msg-txt">
                                 <p>{{item.nickname}}</p>
                                 <span >{{item.msg}}</span>
@@ -50,17 +50,18 @@ import io from 'socket.io-client'
                socket:null,
                nickname:'',
                userAccount:'',
+               avatar:'',
                chatLog:[],
            }
         },
     methods:{
             initSocket(){
                 //昵称存在表示用户已经登录了
-               if(this.$cookies.get('nickname')){
+               if(this.$store.getters.getUserInfoState.nickname){
                    this.socket = io.connect('http://localhost:9001');
-                   this.nickname = this.$cookies.get('nickname');
-                   this.userAccount = this.$cookies.get('userAccount');
-                   let groups = JSON.parse(this.$cookies.get('groups'))
+                   this.nickname = this.$store.getters.getUserInfoState.nickname;
+                   this.userAccount = this.$store.getters.getUserInfoState.userAccount;
+                   let groups = this.$store.getters.getGroupsInfoState;
                    groups.forEach((ele)=>{
                       if(this.groupId==ele.groupAccount){
                             this.groupMemberNum = ele.groupMember.length;
@@ -71,7 +72,7 @@ import io from 'socket.io-client'
                        nickname :this.nickname,
                        msgTime : Date.parse(new Date()),
                        groupAccount : 110,
-                       systemMsg:this.nickname+'加入房间!',
+                       systemMsg:this.nickname+'加入了房间!',
                        type:'systemMsg'
                    }
                     
@@ -94,7 +95,7 @@ import io from 'socket.io-client'
                     }else{
                         console.log(data.msg)
                     }
-                   // console.log(this.chatLog)
+                    console.log(this.chatLog)
              })
          },   
 
@@ -145,7 +146,8 @@ import io from 'socket.io-client'
                 groupAccount:this.groupId,
                 msgTime:Date.parse(new Date()),
                 groupName:this.roomName,
-                msg:inputText
+                msg:inputText,
+                avatar:this.avatar
              }
              //console.log(chatMsg)
              this.socket.emit('g1',chatMsg);
@@ -158,7 +160,7 @@ import io from 'socket.io-client'
                        nickname :this.nickname,
                        msgTime : Date.parse(new Date()),
                        groupAccount : 110,
-                       systemMsg:this.nickname+'离开房间!',
+                       systemMsg:this.nickname+'离开了房间!',
                        type:'systemMsg'
                    }
             this.socket.removeAllListeners()
@@ -171,13 +173,12 @@ import io from 'socket.io-client'
         created(){
             this.groupId = decodeURI(this.$route.query.groupNum);
             this.roomName = decodeURI(this.$route.query.groupName);
+            this.avatar = this.$store.getters.getUserInfoState.avatar
             this.getChatLog()
             this.initSocket()
         },
         mounted(){
             this.$refs.msg.style.height = screen.height - 50 + 'px'  
-            // console.log(this.$refs.msg)      
-            // this.$refs.msg.scrollTo(0,9999)
         },
         updated(){
             this.$refs.msg.scrollTo(0,999999)

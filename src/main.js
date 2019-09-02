@@ -10,6 +10,7 @@ import vueAxios from 'vue-axios'
 import 'muse-ui-loading/dist/muse-ui-loading.css'
 import Loading from 'muse-ui-loading'
 import VueCookies from 'vue-cookies'
+import store from './store'
 
 Vue.use(VueCookies)
 Vue.use(Loading,{
@@ -17,12 +18,30 @@ Vue.use(Loading,{
 })
 Vue.use(MuseUi);
 Vue.use(vueAxios,Axios);
+
 Vue.config.productionTip = false
 
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
   router,
+  store,
   components: { App },
   template: '<App/>'
+})
+//全局路由守卫
+router.beforeEach((to,from,next)=>{
+  
+     if(to.path == '/login'&& !store.getters.getLoginState ){
+         next()
+     }else if(to.path == '/register'){
+       next()
+     }    
+     else{
+        if(store.getters.getLoginState){
+            next()
+        }else{
+            next({ path: '/login'})
+        }
+     }
 })

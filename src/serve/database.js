@@ -4,7 +4,8 @@ const Schema = mongoose.Schema;
 const userSchema = new Schema({
     userAccount:{type:String,required:true,unique:true},
     password:{type:String,required:true},
-    nickname:{type:String,required:true}
+    nickname:{type:String,required:true},
+    avatar:String
 })
 
 const groupSchema = new Schema({
@@ -19,7 +20,8 @@ const groupMsgSchema = new Schema({
     msgTime : Number,
     msg : String,
     groupAccount:Number,
-    groupName:String
+    groupName:String,
+    avatar:String
 })
 
 mongoose.Promise = global.Promise;
@@ -45,22 +47,26 @@ const db = {
     {
         'userAccount': 'zhangsan123',
         'password': '123456',
-        'nickname':'张三'
+        'nickname':'傻狗',
+         'avatar':'../../../static/0.jpg'
     },
     {
         'userAccount': 'lisi123',
         'password': '123456',
-        'nickname':'李四'
+        'nickname':'二狗子',
+        'avatar':'../../../static/1.jpg'
     },
     {
         'userAccount': 'wangwu123',
         'password': '123456',
-        'nickname':'王五'
+        'nickname':'3years',
+        'avatar':'../../../static/t_girl.jpg'
     },
     {
         'userAccount': 'liyang123',
         'password': '123456',
-        'nickname':'李阳'
+        'nickname':'李阳',
+        'avatar':'../../../static/t2_cat.jpg'
     }
 ]
 
@@ -135,7 +141,7 @@ const initData = function(){
                 db.userModel.create(item);
             })
          }else{
-             console.log("用户数据："+data)
+            // console.log("用户数据："+data)
          }
     })
     //初始化群信息
@@ -147,23 +153,23 @@ const initData = function(){
                db.groupModel.create(item);
            })
         }else{
-            console.log("群信息："+data)
+           // console.log("群信息："+data)
         }
    })
 
    //初始化第一个群的消息记录
-   db.groupMsgModelA.find({},function(err,data){
-    if(err){
-        console.log('初始化群1消息出错!'+ err)
-    }
-    // else if(!data.length){
-    //     initGroupMsgA.map(item =>{
-    //        db.groupMsgModelA.create(item);
-    //    })
-    // }else{
-    //     console.log("群1消息："+data)
-    // }
-})
+//    db.groupMsgModelA.find({},function(err,data){
+//     if(err){
+//         console.log('初始化群1消息出错!'+ err)
+//     }
+//     else if(!data.length){
+//         initGroupMsgA.map(item =>{
+//            db.groupMsgModelA.create(item);
+//        })
+//     }else{
+//         console.log("群1消息："+data)
+//     }
+// })
 
  //初始化第二个群的消息记录
  db.groupMsgModelB.find({},function(err,data){
@@ -174,7 +180,7 @@ const initData = function(){
            db.groupMsgModelB.create(item);
        })
     }else{
-        console.log("群2消息："+data)
+       // console.log("群2消息："+data)
     }
  })
 }
