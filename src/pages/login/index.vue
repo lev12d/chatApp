@@ -22,8 +22,8 @@ export default {
     name:'login',
     data () {
         return{
-              username:'lisi123',
-              password:'123456',
+              username:'',
+              password:'',
               alert:false,
               loginMsg:''
            }
@@ -35,7 +35,7 @@ export default {
                  password:this.password
              }
             const loading= this.$loading()
-            this.axios.post('/apis/login',userInfo).then(({data})=>{
+            this.axios.post('http://139.155.18.113:9001/api/login',userInfo).then(({data})=>{
               setTimeout(()=>{
                   loading.close();                   
                  this.loginMsg = data.msg;
@@ -53,7 +53,7 @@ export default {
              },(err)=>{
                 if(err){
                      loading.close();
-                     this.loginMsg = '无法连接到服务器!';
+                     this.loginMsg = '无法连接到服务器!'+err;
                      this.alert = true;
                      setTimeout(()=>{
                           this.alert = false;

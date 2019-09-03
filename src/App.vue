@@ -1,8 +1,8 @@
 <template>
   <div id="app">
    <transition name="fade-transform" enter-class="fade-in-enter" leave-class="fade-out-enter"
-   enter-active-class="fade-in-active" leave-active-class="fade-out-active">
-        <keep-alive :include="cacheNames">
+   enter-active-class="fade-in-active" leave-active-class="fade-out-active" mode="out-in">
+        <keep-alive :include="cacheNames" >
            <router-view/>
         </keep-alive>
    </transition>
@@ -53,6 +53,6 @@ export default {
       opacity: 0
 }
 .fade-out-active,.fade-in-active{
-     transition: all .2s ease
+     transition: all .5s ease
 }
 </style>

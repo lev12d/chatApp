@@ -58,7 +58,7 @@ import io from 'socket.io-client'
             initSocket(){
                 //昵称存在表示用户已经登录了
                if(this.$store.getters.getUserInfoState.nickname){
-                   this.socket = io.connect('http://localhost:9001');
+                   this.socket = io.connect('http://139.155.18.113:9001');
                    this.nickname = this.$store.getters.getUserInfoState.nickname;
                    this.userAccount = this.$store.getters.getUserInfoState.userAccount;
                    let groups = this.$store.getters.getGroupsInfoState;
@@ -89,13 +89,13 @@ import io from 'socket.io-client'
 
          getChatLog(){
              let groupId = Number(this.groupId);
-             this.axios.post('/apis/getChatLog',{groupAccount:groupId}).then(({data})=>{
+             this.axios.post('http://139.155.18.113:9001/api/getChatLog',{groupAccount:groupId}).then(({data})=>{
                     if(data.status === 1){
                          this.chatLog=data.data
                     }else{
                         console.log(data.msg)
                     }
-                    console.log(this.chatLog)
+                    //console.log(this.chatLog)
              })
          },   
 

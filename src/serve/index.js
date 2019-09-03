@@ -48,7 +48,7 @@ io.on('connection',function(socket){
       })
 
       socket.on('g1',function(data){
-             console.log(data);
+            // console.log(data);
             //  let groupAccount = data.groupAccount;
              socket.join('g1')
              db.groupMsgModelA.create(data,function(err){

@@ -51,7 +51,7 @@
         methods :{
           getGroups(){
               let userAccount =this.$store.getters.getUserInfoState.userAccount;
-              this.axios.post('/apis/getGroups',{userAccount}).then(({data})=>{
+              this.axios.post('http://139.155.18.113:9001/api/getGroups',{userAccount}).then(({data})=>{
                    if(data.status==1){
                         this.groups = data.data;
                          this.$store.dispatch('updateGroupsStates',data.data)

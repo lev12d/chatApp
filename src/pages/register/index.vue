@@ -34,14 +34,14 @@
            handleRegister(){
               if(this.password===this.enpassword){
                   let num = parseInt(Math.random()*10);
-                   let imgUrl ='../../../static/'+num+'.jpg'
+                   let imgUrl ='./static/'+num+'.jpg'
                    let regInfo = {
                    userAccount:this.username,
                    password:this.password,
                    nickname:this.nickname,
                    avatar: imgUrl
                    }
-                    this.axios.post('/apis/register',regInfo).then(({data})=>{
+                    this.axios.post('http://139.155.18.113:9001/api/register',regInfo).then(({data})=>{
                          console.log(data)
                          this.msg = data.msg;
                          this.alert = true;
